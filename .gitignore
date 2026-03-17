@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.7z
+*.blend
+*.fbx
+uploads_files_*
+textures/*.exr
+.DS_Store
+.gemini/
+.agents/
+build/
+.vscode/
+.idea/
+/textures/Max Headroom material Normal.1002.exr
+/textures/Max Headroom material Normal.1001.exr

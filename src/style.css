@@ -1,0 +1,1027 @@
+/* ═══════════════════════════════════════════════════
+   MAX HEADROOM 3D — STYLE SYSTEM
+   2000s DAW Visual Language
+   Polished black glass strip · Copper buttons · RGB LED inlays
+   ═══════════════════════════════════════════════════ */
+
+/* ── Design Tokens ── */
+:root {
+  --neon-green: #00ff41;
+  --neon-blue: #4488ff;
+  --neon-red: #ff2244;
+  --neon-amber: #ff9900;
+  --dark-bg: #080808;
+  --glass-bg: rgba(0, 255, 65, 0.04);
+  --glass-border: rgba(0, 255, 65, 0.18);
+
+  /* DAW strip palette */
+  --daw-bg-top: #1c1c1c;
+  --daw-bg-mid: #0d0d0d;
+  --daw-bg-bot: #040404;
+  --daw-bevel: rgba(255, 255, 255, 0.07);
+  --daw-shadow: rgba(0, 0, 0, 0.9);
+  --daw-divider: #1e1e1e;
+  --daw-label: #5a5a5a;
+  --daw-strip-h: 148px;
+
+  /* Copper button palette */
+  --copper-hi: #e8a060;
+  --copper-mid: #b87333;
+  --copper-lo: #7a4820;
+  --copper-shade: #3d2010;
+
+  /* Source LED colors */
+  --led-green: #00ff41;
+  --led-blue: #4488ff;
+  --led-red: #ff2244;
+  --led-amber: #ff9900;
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: var(--neon-green);
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ══════════════════════════════════════════════════════
+   OVERLAY / START SCREEN
+   ══════════════════════════════════════════════════════ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 8, 0.96);
+  z-index: 300;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(12px);
+  transition: opacity 0.5s ease;
+}
+
+.overlay-content {
+  text-align: center;
+  border: 1px solid var(--glass-border);
+  padding: 48px 56px;
+  background: rgba(0, 255, 65, 0.04);
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.15), inset 0 0 60px rgba(0, 255, 65, 0.03);
+  border-radius: 6px;
+  max-width: 480px;
+}
+
+.overlay h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px var(--neon-green), 0 0 40px rgba(0, 255, 65, 0.3);
+  margin-bottom: 12px;
+}
+
+.overlay p {
+  margin-bottom: 28px;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.controls-hint {
+  margin-top: 20px !important;
+  margin-bottom: 0 !important;
+  font-size: 0.82rem !important;
+  color: #555;
+}
+
+#start-btn {
+  padding: 14px 36px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  /* override fixed daw-btn dimensions inside overlay */
+  width: auto;
+  height: auto;
+  min-width: 220px;
+}
+
+/* LP button active glow  */
+.aqua-button.lp-active {
+  background: rgba(255, 153, 0, 0.18);
+  border-color: var(--neon-amber);
+  color: var(--neon-amber);
+  box-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+}
+
+/* ══════════════════════════════════════════════════════
+   APP SHELL LAYOUT
+   ══════════════════════════════════════════════════════ */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+/* ── Header ── */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 1.2rem;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.10);
+  background: linear-gradient(180deg, #111 0%, #0a0a0a 100%);
+  flex-shrink: 0;
+}
+
+.system-status {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  opacity: 0.65;
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* ── Main canvas area ── */
+.content-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  padding: 0.6rem 0.6rem 0;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(0, 255, 65, 0.14);
+  background: #000;
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.08);
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Settings panel buttons — override Aqua2 library interference */
+.settings-content .aqua-button {
+  display: block;
+  width: 100%;
+  padding: 0.65rem !important;
+  margin-bottom: 0.6rem !important;
+  background: rgba(0, 255, 65, 0.07) !important;
+  border: 1px solid rgba(0, 255, 65, 0.22) !important;
+  color: var(--neon-green) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  text-transform: uppercase !important;
+  box-shadow: none !important;
+  text-align: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.settings-content .aqua-button:hover {
+  background: var(--neon-green) !important;
+  color: #000 !important;
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.5) !important;
+}
+
+.settings-content .aqua-button.reset {
+  border-color: #ff4444 !important;
+  color: #ff4444 !important;
+  background: transparent !important;
+}
+
+.settings-content .aqua-button.reset:hover {
+  background: #ff4444 !important;
+  color: #fff !important;
+}
+
+/* Webcam PIP */
+#webcam-video {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  width: 180px;
+  height: 135px;
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  border-radius: 6px;
+  z-index: 10;
+  opacity: 0.85;
+}
+
+/* CRT scanlines */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(180deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(0, 0, 0, 0.18) 3px,
+      rgba(0, 0, 0, 0.18) 4px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ══════════════════════════════════════════════════════
+   AQUA HEADER BUTTONS (small utility buttons in header)
+   ══════════════════════════════════════════════════════ */
+.aqua-button {
+  background: rgba(0, 255, 65, 0.07);
+  border: 1px solid rgba(0, 255, 65, 0.22);
+  color: var(--neon-green);
+  padding: 0.38rem 0.85rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.aqua-button:hover {
+  background: var(--neon-green);
+  color: #000;
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
+}
+
+.aqua-button:active {
+  transform: scale(0.95);
+}
+
+.aqua-button.reset {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.aqua-button.reset:hover {
+  background: #ff4444;
+  color: #fff;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   ██████████  DAW CONTROL STRIP  ██████████
+   ══════════════════════════════════════════════════════ */
+.daw-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: var(--daw-strip-h);
+  flex-shrink: 0;
+
+  background:
+    linear-gradient(180deg,
+      #222 0%,
+      #181818 6%,
+      #0e0e0e 20%,
+      #080808 60%,
+      #040404 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.07),
+    inset 0 1px 3px rgba(255, 255, 255, 0.04),
+    0 -2px 12px rgba(0, 0, 0, 0.9);
+  border-top: 1px solid #2a2a2a;
+  padding: 8px 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* hide scrollbar on strip */
+.daw-strip::-webkit-scrollbar {
+  height: 4px;
+  background: #111;
+}
+
+.daw-strip::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
+}
+
+/* ── Section wrappers ── */
+.daw-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.daw-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: var(--daw-label);
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #222;
+  width: 100%;
+}
+
+/* vertical glass divider between sections */
+.daw-divider {
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(180deg, transparent 0%, #333 20%, #333 80%, transparent 100%);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+/* ── D-pad 3x3 grid ── */
+.daw-btn-grid--dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(3, 34px);
+  gap: 3px;
+}
+
+/* ── 2×2 render grid ── */
+.daw-btn-grid--2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 42px);
+  grid-template-rows: repeat(2, 34px);
+  gap: 3px;
+}
+
+/* ── Vertical button stack ── */
+.daw-btn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+}
+
+/* ── Camera section internals ── */
+.daw-camera-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Source channels section ── */
+.daw-section--sources {
+  padding: 0 8px;
+}
+
+.daw-sources {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex: 1;
+}
+
+.source-channel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.source-channel:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* LED indicator (top of fader) */
+.source-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  transition: background 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.source-led.active[data-color="green"] {
+  background: var(--led-green);
+  box-shadow: 0 0 8px var(--led-green), 0 0 16px rgba(0, 255, 65, 0.4);
+}
+
+.source-led.active[data-color="blue"] {
+  background: var(--led-blue);
+  box-shadow: 0 0 8px var(--led-blue), 0 0 16px rgba(68, 136, 255, 0.4);
+}
+
+.source-led.active[data-color="red"] {
+  background: var(--led-red);
+  box-shadow: 0 0 8px var(--led-red), 0 0 16px rgba(255, 34, 68, 0.4);
+}
+
+.source-led.active[data-color="amber"] {
+  background: var(--led-amber);
+  box-shadow: 0 0 8px var(--led-amber), 0 0 16px rgba(255, 153, 0, 0.4);
+}
+
+/* Slide pot fader track */
+.source-fader-track {
+  width: 12px;
+  height: 60px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #181818 40%, #0a0a0a 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  position: relative;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+/* Groove / slot in the track */
+.source-fader-track::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #111 0%, #222 50%, #111 100%);
+  border-radius: 1px;
+}
+
+/* Copper fader knob */
+.source-fader-knob {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  /* 'UP' default = source ON */
+  width: 18px;
+  height: 24px;
+  transform: translate(-50%, 0);
+  border-radius: 3px;
+  background:
+    radial-gradient(ellipse at 40% 30%, var(--copper-hi) 0%, var(--copper-mid) 50%, var(--copper-lo) 100%);
+  border-top: 1px solid rgba(255, 190, 100, 0.7);
+  border-left: 1px solid rgba(255, 170, 80, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+  border-right: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 200, 120, 0.3);
+  cursor: ns-resize;
+  transition: top 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.18s;
+  z-index: 2;
+}
+
+/* When source is OFF, knob slides to bottom */
+.source-channel.off .source-fader-knob {
+  top: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), inset 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.source-name {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #444;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.source-channel:not(.off) .source-name {
+  color: #888;
+}
+
+/* ── Status section ── */
+.daw-section--status {
+  min-width: 100px;
+}
+
+.daw-status-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  width: 100%;
+}
+
+.ctrl-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #0a0a0a;
+  width: 100%;
+}
+
+.ctrl-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1c1c1c;
+  border: 1px solid #333;
+  flex-shrink: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.ctrl-led.connected {
+  background: var(--neon-amber);
+  box-shadow: 0 0 8px var(--neon-amber), 0 0 16px rgba(255, 153, 0, 0.4);
+}
+
+.ctrl-name {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #444;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 72px;
+}
+
+.ctrl-led.connected~.ctrl-name {
+  color: #999;
+}
+
+/* Audio visualizer bars */
+.daw-visualizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 28px;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.daw-bar {
+  flex: 1;
+  min-height: 3px;
+  background: var(--neon-green);
+  border-radius: 1px;
+  opacity: 0.7;
+  transition: height 0.08s ease, background-color 0.1s;
+  box-shadow: 0 0 4px rgba(0, 255, 65, 0.4);
+}
+
+/* ══════════════════════════════════════════════════════
+   ██████████  COPPER DAW BUTTONS  ██████████
+   ══════════════════════════════════════════════════════ */
+.daw-btn {
+  /* Copper base */
+  background:
+    radial-gradient(ellipse at 40% 25%, var(--copper-hi) 0%, var(--copper-mid) 45%, var(--copper-lo) 75%, var(--copper-shade) 100%);
+  border-top: 1px solid rgba(240, 170, 80, 0.65);
+  border-left: 1px solid rgba(220, 145, 60, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+  border-right: 1px solid rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.7),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 200, 120, 0.25);
+
+  color: #f0d080;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.1s ease;
+  position: relative;
+  overflow: hidden;
+  width: 36px;
+  height: 34px;
+}
+
+/* Inlay glow slot — the colored LED strip at bottom of button face */
+.daw-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 2px;
+  opacity: 0.8;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+/* Color variants */
+.daw-btn--green::after {
+  background: var(--neon-green);
+  box-shadow: 0 0 6px var(--neon-green), 0 0 12px rgba(0, 255, 65, 0.5);
+}
+
+.daw-btn--blue::after {
+  background: var(--neon-blue);
+  box-shadow: 0 0 6px var(--neon-blue), 0 0 12px rgba(68, 136, 255, 0.5);
+}
+
+.daw-btn--red::after {
+  background: var(--neon-red);
+  box-shadow: 0 0 6px var(--neon-red), 0 0 12px rgba(255, 34, 68, 0.5);
+}
+
+.daw-btn--amber::after {
+  background: var(--neon-amber);
+  box-shadow: 0 0 6px var(--neon-amber), 0 0 12px rgba(255, 153, 0, 0.5);
+}
+
+/* Hover */
+.daw-btn:hover {
+  background:
+    radial-gradient(ellipse at 40% 25%, #f0c080 0%, #d09040 45%, #9a6030 75%, #5a3020 100%);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 220, 140, 0.4);
+  color: #fff8e0;
+}
+
+.daw-btn--green:hover::after {
+  opacity: 1;
+  box-shadow: 0 0 10px var(--neon-green), 0 0 20px rgba(0, 255, 65, 0.7);
+}
+
+.daw-btn--blue:hover::after {
+  opacity: 1;
+  box-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(68, 136, 255, 0.7);
+}
+
+.daw-btn--red:hover::after {
+  opacity: 1;
+  box-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 34, 68, 0.7);
+}
+
+.daw-btn--amber:hover::after {
+  opacity: 1;
+  box-shadow: 0 0 10px var(--neon-amber), 0 0 20px rgba(255, 153, 0, 0.7);
+}
+
+/* Pressed / active */
+.daw-btn:active,
+.daw-btn.active {
+  transform: translateY(1px) scale(0.96);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.8),
+    inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.daw-btn--green.active::after {
+  box-shadow: 0 0 14px var(--neon-green), 0 0 28px var(--neon-green);
+}
+
+.daw-btn--blue.active::after {
+  box-shadow: 0 0 14px var(--neon-blue), 0 0 28px var(--neon-blue);
+}
+
+.daw-btn--red.active::after {
+  box-shadow: 0 0 14px var(--neon-red), 0 0 28px var(--neon-red);
+}
+
+.daw-btn--amber.active::after {
+  box-shadow: 0 0 14px var(--neon-amber), 0 0 28px var(--neon-amber);
+}
+
+.daw-btn:focus {
+  outline: 1px solid rgba(255, 200, 100, 0.4);
+  outline-offset: 2px;
+}
+
+/* Size modifiers */
+.daw-btn.sm {
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+}
+
+.daw-btn.wide {
+  width: 100%;
+  min-width: 80px;
+}
+
+/* SHIFT toggle sticky-active style */
+.shift-toggle.active {
+  background:
+    radial-gradient(ellipse at 40% 25%, #80ccff 0%, #4488ff 45%, #2255cc 100%);
+  color: #e0f0ff;
+  border-top-color: rgba(180, 220, 255, 0.7);
+}
+
+.shift-toggle.active::after {
+  background: #4488ff;
+  box-shadow: 0 0 14px #4488ff, 0 0 28px rgba(68, 136, 255, 0.8);
+}
+
+
+/* ══════════════════════════════════════════════════════
+   MODALS AND SETTINGS PANEL
+   ══════════════════════════════════════════════════════ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 8, 0.95);
+  z-index: 400;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(12px);
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: rgba(0, 255, 65, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 92%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.15);
+  position: relative;
+  width: 700px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--neon-green);
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #fff;
+  transform: scale(1.2);
+}
+
+#keyboard-modal h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.control-section h3 {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.8rem;
+  color: rgba(0, 255, 65, 0.7);
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  padding-bottom: 6px;
+}
+
+.control-section table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.control-section td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.06);
+}
+
+.control-section td:first-child {
+  min-width: 110px;
+  font-weight: 600;
+}
+
+kbd {
+  background: rgba(0, 255, 65, 0.08);
+  border: 1px solid var(--glass-border);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+/* Settings Panel */
+.settings-panel {
+  position: fixed;
+  right: -320px;
+  top: 0;
+  width: 300px;
+  height: 100vh;
+  background: rgba(8, 8, 8, 0.99);
+  border-left: 1px solid rgba(0, 255, 65, 0.12);
+  overflow-y: auto;
+  transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 350;
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.settings-panel.show {
+  right: 0;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  position: sticky;
+  top: 0;
+  background: rgba(8, 8, 8, 0.99);
+}
+
+.settings-header h3 {
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--neon-green);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.close-btn:hover {
+  color: #fff;
+  transform: scale(1.2);
+}
+
+.settings-content {
+  padding: 1.2rem 1rem;
+}
+
+.setting-group {
+  margin-bottom: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.setting-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(0, 255, 65, 0.7);
+  text-transform: uppercase;
+}
+
+.setting-group input[type="range"] {
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(0, 255, 65, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.setting-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+.setting-group input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+.setting-value {
+  font-size: 0.78rem;
+  color: var(--neon-green);
+  font-weight: 800;
+}
+
+.setting-group.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setting-group.checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--neon-green);
+}
+
+.setting-group.checkbox label {
+  margin: 0;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.setting-group select {
+  background: rgba(0, 255, 65, 0.04);
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  color: var(--neon-green);
+  padding: 0.45rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.setting-group select option {
+  background: #080808;
+  color: var(--neon-green);
+}
+
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  :root {
+    --daw-strip-h: 130px;
+  }
+
+  .daw-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.62rem;
+  }
+
+  .daw-btn-grid--dpad {
+    grid-template-columns: repeat(3, 30px);
+    grid-template-rows: repeat(3, 30px);
+  }
+
+  .daw-btn-grid--2x2 {
+    grid-template-columns: repeat(2, 34px);
+    grid-template-rows: repeat(2, 30px);
+  }
+
+  .source-fader-track {
+    height: 44px;
+  }
+
+  .source-channel.off .source-fader-knob {
+    top: 22px;
+  }
+
+  .system-status {
+    font-size: 0.65rem;
+  }
+}
