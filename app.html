@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Max Headroom 3D Lip Sync</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+
+<body>
+  <!-- Overlay for Audio Context Gesture -->
+  <div id="start-overlay" class="overlay">
+    <div class="overlay-content">
+      <h1>MAX HEADROOM 3D</h1>
+      <p>A reactive 3D wireframe lip-sync experiment.</p>
+      <button id="start-btn" class="daw-btn daw-btn--green wide">Enable Audio &amp; Start</button>
+      <p class="controls-hint">Press ? for keyboard controls or click the help icon.</p>
+    </div>
+  </div>
+
+  <!-- Keyboard Reference Modal -->
+  <div id="keyboard-modal" class="modal overlay">
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close" aria-label="Close keyboard reference">&times;</button>
+      <h2>Controls Reference</h2>
+      <div class="controls-grid">
+        <div class="control-section">
+          <h3>Character Control</h3>
+          <table>
+            <tr>
+              <td><kbd>↑↓←→</kbd></td>
+              <td>Rotate Head</td>
+            </tr>
+            <tr>
+              <td><kbd>I/K/J/L</kbd></td>
+              <td>Move Eyes</td>
+            </tr>
+            <tr>
+              <td><kbd>G</kbd></td>
+              <td>Toggle Sunglasses</td>
+            </tr>
+            <tr>
+              <td><kbd>SPACE</kbd></td>
+              <td>Force Jaw Open</td>
+            </tr>
+          </table>
+        </div>
+        <div class="control-section">
+          <h3>Camera Control</h3>
+          <table>
+            <tr>
+              <td><kbd>W/S/A/D</kbd></td>
+              <td>Rotate &amp; Zoom</td>
+            </tr>
+            <tr>
+              <td><kbd>SHIFT+W/S/A/D</kbd></td>
+              <td>Move Camera</td>
+            </tr>
+            <tr>
+              <td>Right-click drag</td>
+              <td>Free Camera</td>
+            </tr>
+          </table>
+        </div>
+        <div class="control-section">
+          <h3>Render Modes</h3>
+          <table>
+            <tr>
+              <td><kbd>1</kbd></td>
+              <td>Wireframe</td>
+            </tr>
+            <tr>
+              <td><kbd>2</kbd></td>
+              <td>Flat Shaded</td>
+            </tr>
+            <tr>
+              <td><kbd>3</kbd></td>
+              <td>Cyber (Default)</td>
+            </tr>
+            <tr>
+              <td><kbd>4</kbd></td>
+              <td>Opaque / Textured</td>
+            </tr>
+          </table>
+        </div>
+        <div class="control-section">
+          <h3>PS4 Controller</h3>
+          <table>
+            <tr>
+              <td>Left Stick</td>
+              <td>Head Yaw / Pitch</td>
+            </tr>
+            <tr>
+              <td>Right Stick</td>
+              <td>Camera Orbit</td>
+            </tr>
+            <tr>
+              <td>L2 + Right Stick</td>
+              <td>Eye Look</td>
+            </tr>
+            <tr>
+              <td>R2 (analog)</td>
+              <td>Jaw Open</td>
+            </tr>
+            <tr>
+              <td>✕ Cross</td>
+              <td>Jaw Snap</td>
+            </tr>
+            <tr>
+              <td>□ Square</td>
+              <td>Toggle Shades</td>
+            </tr>
+            <tr>
+              <td>▲ Triangle</td>
+              <td>Cycle Render Mode</td>
+            </tr>
+            <tr>
+              <td>○ Circle</td>
+              <td>Calibrate Head</td>
+            </tr>
+            <tr>
+              <td>Share</td>
+              <td>Help</td>
+            </tr>
+            <tr>
+              <td>Options</td>
+              <td>Settings</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="settings-panel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button id="settings-close" class="close-btn" aria-label="Close settings">&times;</button>
+    </div>
+    <div class="settings-content">
+      <div class="setting-group">
+        <label for="audio-sensitivity">Audio Sensitivity</label>
+        <input type="range" id="audio-sensitivity" min="20" max="100" value="60" aria-label="Audio sensitivity slider">
+        <span class="setting-value" id="audio-sensitivity-value">60</span>
+      </div>
+      <div class="setting-group">
+        <label for="audio-threshold">Audio Threshold</label>
+        <input type="range" id="audio-threshold" min="0" max="30" value="10" aria-label="Audio threshold slider">
+        <span class="setting-value" id="audio-threshold-value">10</span>
+      </div>
+      <div class="setting-group">
+        <label for="camera-speed">Camera Speed</label>
+        <input type="range" id="camera-speed" min="0.02" max="0.2" step="0.02" value="0.05"
+          aria-label="Camera speed slider">
+        <span class="setting-value" id="camera-speed-value">0.05</span>
+      </div>
+      <div class="setting-group">
+        <label for="rotation-speed">Rotation Speed</label>
+        <input type="range" id="rotation-speed" min="0.01" max="0.05" step="0.001" value="0.02"
+          aria-label="Rotation speed slider">
+        <span class="setting-value" id="rotation-speed-value">0.02</span>
+      </div>
+      <div class="setting-group checkbox">
+        <input type="checkbox" id="audio-feedback" checked aria-label="Enable audio visual feedback">
+        <label for="audio-feedback">Audio Visual Feedback</label>
+      </div>
+      <div class="setting-group">
+        <label for="tex-offset-x">Tex Offset X: <span id="tex-offset-x-val" class="setting-value">0</span></label>
+        <input type="range" id="tex-offset-x" min="-2" max="2" step="0.01" value="0">
+      </div>
+      <div class="setting-group">
+        <label for="tex-offset-y">Tex Offset Y: <span id="tex-offset-y-val" class="setting-value">0</span></label>
+        <input type="range" id="tex-offset-y" min="-2" max="2" step="0.01" value="0">
+      </div>
+      <div class="setting-group">
+        <label for="tex-scale-x">Tex Scale X: <span id="tex-scale-x-val" class="setting-value">1</span></label>
+        <input type="range" id="tex-scale-x" min="0.1" max="5" step="0.01" value="1">
+      </div>
+      <div class="setting-group">
+        <label for="tex-scale-y">Tex Scale Y: <span id="tex-scale-y-val" class="setting-value">1</span></label>
+        <input type="range" id="tex-scale-y" min="0.1" max="5" step="0.01" value="1">
+      </div>
+      <div class="setting-group">
+        <label for="theme-select">Color Theme</label>
+        <select id="theme-select" aria-label="Select color theme">
+          <option value="green">Green (Default)</option>
+          <option value="cyan">Cyan</option>
+          <option value="magenta">Magenta</option>
+          <option value="yellow">Yellow</option>
+        </select>
+      </div>
+      <button id="export-state-btn" class="aqua-button">Export State as URL</button>
+      <button id="settings-reset-btn" class="aqua-button reset">Reset to Defaults</button>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <div class="main-container">
+
+    <!-- Header status bar -->
+    <header class="app-header">
+      <h2 class="system-status">SYSTEM_ONLINE /// AUDIO_SYNC_ACTIVE</h2>
+      <div class="header-controls">
+        <button id="perf-monitor" class="aqua-button" title="Toggle Performance Monitor"
+          aria-label="Toggle performance monitor">
+          <span class="perf-label">FPS: <span id="fps-display">60</span></span>
+        </button>
+        <button id="low-process-btn" class="aqua-button" title="Toggle Low-Process Mode (caps to ~24fps)"
+          aria-label="Toggle low-process mode">LP</button>
+        <button id="help-btn" class="aqua-button" title="Show Keyboard Controls"
+          aria-label="Show keyboard controls">?</button>
+        <button id="settings-btn" class="aqua-button" title="Settings" aria-label="Open settings">⚙</button>
+        <button id="fullscreen-btn" class="aqua-button" title="Toggle Fullscreen"
+          aria-label="Toggle fullscreen">⛶</button>
+      </div>
+    </header>
+
+    <!-- Canvas area fills available space -->
+    <main class="content-area">
+      <div class="canvas-wrapper">
+        <video id="webcam-video" autoplay playsinline></video>
+        <canvas id="webgl-canvas"></canvas>
+        <div class="scanlines"></div>
+      </div>
+    </main>
+
+    <!-- ═══════════════════  DAW CONTROL STRIP  ═══════════════════ -->
+    <footer class="daw-strip" id="daw-strip">
+
+      <!-- ── INPUT SOURCE SECTION ── -->
+      <div class="daw-section daw-section--sources">
+        <div class="daw-section-label">INPUT</div>
+        <div class="daw-sources">
+
+          <div class="source-channel" id="src-keyboard">
+            <div class="source-led" data-color="green"></div>
+            <div class="source-fader-track">
+              <div class="source-fader-knob"></div>
+            </div>
+            <div class="source-name">KEY</div>
+          </div>
+
+          <div class="source-channel" id="src-mouse">
+            <div class="source-led" data-color="blue"></div>
+            <div class="source-fader-track">
+              <div class="source-fader-knob"></div>
+            </div>
+            <div class="source-name">MOUSE</div>
+          </div>
+
+          <div class="source-channel" id="src-video">
+            <div class="source-led" data-color="red"></div>
+            <div class="source-fader-track">
+              <div class="source-fader-knob"></div>
+            </div>
+            <div class="source-name">VIDEO</div>
+          </div>
+
+          <div class="source-channel" id="src-controller">
+            <div class="source-led" data-color="amber"></div>
+            <div class="source-fader-track">
+              <div class="source-fader-knob"></div>
+            </div>
+            <div class="source-name">CTRL</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="daw-divider"></div>
+
+      <!-- ── HEAD SECTION ── -->
+      <div class="daw-section">
+        <div class="daw-section-label">HEAD</div>
+        <div class="daw-btn-grid daw-btn-grid--dpad">
+          <div></div>
+          <button class="daw-btn daw-btn--green" data-key="ArrowUp" title="Tilt Up" aria-label="Tilt Up">↑</button>
+          <div></div>
+          <button class="daw-btn daw-btn--green" data-key="ArrowLeft" title="Turn Left"
+            aria-label="Turn Left">←</button>
+          <button class="daw-btn daw-btn--green sm" id="calibrate-btn" title="Set Zero Position"
+            aria-label="Calibrate">0</button>
+          <button class="daw-btn daw-btn--green" data-key="ArrowRight" title="Turn Right"
+            aria-label="Turn Right">→</button>
+          <div></div>
+          <button class="daw-btn daw-btn--green" data-key="ArrowDown" title="Tilt Down"
+            aria-label="Tilt Down">↓</button>
+          <div></div>
+        </div>
+      </div>
+
+      <div class="daw-divider"></div>
+
+      <!-- ── EYES SECTION ── -->
+      <div class="daw-section">
+        <div class="daw-section-label">EYES</div>
+        <div class="daw-btn-grid daw-btn-grid--dpad">
+          <div></div>
+          <button class="daw-btn daw-btn--green" data-key="KeyI" title="Look Up" aria-label="Look Up">I</button>
+          <div></div>
+          <button class="daw-btn daw-btn--green" data-key="KeyJ" title="Look Left" aria-label="Look Left">J</button>
+          <button class="daw-btn daw-btn--green sm" title="Center Eyes" aria-label="Center Eyes"
+            id="eye-center-btn">·</button>
+          <button class="daw-btn daw-btn--green" data-key="KeyL" title="Look Right" aria-label="Look Right">L</button>
+          <div></div>
+          <button class="daw-btn daw-btn--green" data-key="KeyK" title="Look Down" aria-label="Look Down">K</button>
+          <div></div>
+        </div>
+      </div>
+
+      <div class="daw-divider"></div>
+
+      <!-- ── MOUTH SECTION ── -->
+      <div class="daw-section">
+        <div class="daw-section-label">MOUTH</div>
+        <div class="daw-btn-stack">
+          <button class="daw-btn daw-btn--red wide" data-key="Space" title="Force Jaw Open"
+            aria-label="Force Jaw Open">JAW</button>
+          <button class="daw-btn daw-btn--red wide" data-key="KeyG" title="Toggle Sunglasses"
+            aria-label="Toggle Sunglasses">SHADES</button>
+        </div>
+      </div>
+
+      <div class="daw-divider"></div>
+
+      <!-- ── CAMERA SECTION ── -->
+      <div class="daw-section">
+        <div class="daw-section-label">CAMERA</div>
+        <div class="daw-camera-layout">
+          <div class="daw-btn-grid daw-btn-grid--dpad">
+            <div></div>
+            <button class="daw-btn daw-btn--blue" data-key="KeyW" title="Zoom In" aria-label="Zoom In">W</button>
+            <div></div>
+            <button class="daw-btn daw-btn--blue" data-key="KeyA" title="Rotate Left"
+              aria-label="Rotate Left">A</button>
+            <button class="daw-btn daw-btn--blue sm" data-key="KeyW" data-shift="true" title="Move Up"
+              aria-label="Move Up">▲</button>
+            <button class="daw-btn daw-btn--blue" data-key="KeyD" title="Rotate Right"
+              aria-label="Rotate Right">D</button>
+            <div></div>
+            <button class="daw-btn daw-btn--blue" data-key="KeyS" title="Zoom Out" aria-label="Zoom Out">S</button>
+            <div></div>
+          </div>
+          <button class="daw-btn daw-btn--blue wide shift-toggle" id="shift-toggle" title="Toggle SHIFT Mode"
+            aria-label="Toggle SHIFT Mode">SHIFT</button>
+        </div>
+      </div>
+
+      <div class="daw-divider"></div>
+
+      <!-- ── RENDER SECTION ── -->
+      <div class="daw-section">
+        <div class="daw-section-label">RENDER</div>
+        <div class="daw-btn-grid daw-btn-grid--2x2">
+          <button class="daw-btn daw-btn--green sm" data-key="Digit1" title="Wireframe"
+            aria-label="Wireframe Mode">WF</button>
+          <button class="daw-btn daw-btn--blue sm" data-key="Digit2" title="Flat Shaded"
+            aria-label="Flat Shaded Mode">FS</button>
+          <button class="daw-btn daw-btn--red sm" data-key="Digit3" title="Cyber Mode"
+            aria-label="Cyber Mode">CB</button>
+          <button class="daw-btn daw-btn--amber sm" data-key="Digit4" title="Opaque Mode"
+            aria-label="Opaque Mode">OP</button>
+        </div>
+      </div>
+
+      <div class="daw-divider"></div>
+
+      <!-- ── STATUS / CONTROLLER ── -->
+      <div class="daw-section daw-section--status">
+        <div class="daw-section-label">STATUS</div>
+        <div class="daw-status-block">
+          <div class="ctrl-status" id="ctrl-status">
+            <div class="ctrl-led" id="ctrl-led"></div>
+            <div class="ctrl-name" id="ctrl-name">NO CTRL</div>
+          </div>
+          <div class="daw-visualizer">
+            <div class="daw-bar"></div>
+            <div class="daw-bar"></div>
+            <div class="daw-bar"></div>
+            <div class="daw-bar"></div>
+            <div class="daw-bar"></div>
+          </div>
+        </div>
+      </div>
+
+    </footer>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+  </div>
+
+  <script type="module" src="/src/main_obj_legacy.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/thatdhruv/aqua2@main/aqua2.js"></script>
+</body>
+
+</html>

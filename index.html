@@ -1,398 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Max Headroom 3D Lip Sync</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/style.css">
+  <title>HEADROOM // LCARS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --orange: #ff9900;
+      --amber: #ffcc00;
+      --blue: #99ccff;
+      --lavender: #cc99cc;
+      --red: #cc6666;
+      --teal: #3399cc;
+      --dim: rgba(18,22,32,0.85);
+      --border: rgba(255,153,0,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: #fff; font-family: 'Share Tech Mono', monospace; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 800px 500px at 20% 10%, rgba(255,153,0,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 700px 400px at 80% 85%, rgba(153,102,204,0.05) 0%, transparent 60%);
+    }
+    .frame {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      min-height: 100vh;
+      position: relative; z-index: 1;
+      padding: 20px;
+      gap: 16px;
+    }
+    /* SIDEBAR */
+    .sidebar { display: flex; flex-direction: column; gap: 8px; }
+    .elbow {
+      height: 80px; background: var(--orange); border-radius: 40px 0 0 0;
+      display: flex; align-items: flex-end; padding: 10px 14px;
+      font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 11px;
+      color: #000; letter-spacing: 2px;
+    }
+    .bar { height: 40px; display: flex; align-items: center; padding: 0 12px;
+      font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; color: #000; }
+    .bar.amber { background: var(--amber); }
+    .bar.blue  { background: var(--blue); }
+    .bar.red   { background: var(--red); }
+    .bar.lavender { background: var(--lavender); }
+    .spacer { flex: 1; background: rgba(255,153,0,0.12); border-left: 10px solid var(--orange); min-height: 40px; }
+    .endcap { height: 50px; background: var(--lavender); border-radius: 0 0 0 25px;
+      display: flex; align-items: center; padding-left: 14px;
+      font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700;
+      color: #000; letter-spacing: 1px; }
+    /* MAIN */
+    .main { display: flex; flex-direction: column; gap: 20px; }
+    .top-bar {
+      background: var(--dim); border: 1px solid var(--border);
+      border-radius: 0 20px 20px 0; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      box-shadow: 0 0 30px rgba(255,153,0,0.07);
+    }
+    .sys-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--blue); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+    .title { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; color: var(--orange); letter-spacing: 4px; text-transform: uppercase; }
+    .badge { background: rgba(255,204,0,0.1); border: 1px solid var(--amber); color: var(--amber);
+      padding: 4px 12px; border-radius: 4px; font-size: 10px; letter-spacing: 2px; }
+    /* DIVIDER */
+    .divider { display: flex; align-items: center; gap: 10px; }
+    .div-pill { width: 40px; height: 24px; background: var(--orange); border-radius: 12px 0 0 12px; }
+    .div-label { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: var(--orange); letter-spacing: 3px; text-transform: uppercase; }
+    .div-bar { flex: 1; height: 5px; background: var(--orange); border-radius: 3px; }
+    /* CONTENT PANEL */
+    .panel {
+      background: var(--dim); border: 1px solid var(--border);
+      border-radius: 12px; border-left: 6px solid var(--orange);
+      padding: 32px 40px; display: flex; flex-direction: column; gap: 28px;
+    }
+    .description { color: #ccddff; font-size: 1.05rem; line-height: 1.75; max-width: 680px; }
+    .type-tag { display: inline-block; color: var(--amber); font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 4px; }
+    /* LAUNCH BTN */
+    .launch-wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .lcars-btn {
+      background: var(--orange); color: #000; border: none;
+      border-radius: 28px; padding: 14px 52px;
+      font-size: 1.3rem; font-family: 'Orbitron', sans-serif; font-weight: 700;
+      letter-spacing: 0.2em; cursor: pointer; text-decoration: none;
+      display: inline-block; text-transform: uppercase;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px rgba(255,153,0,0.3);
+    }
+    .lcars-btn:hover { background: var(--amber); box-shadow: 0 0 30px rgba(255,204,0,0.5); }
+    .back-btn {
+      background: rgba(153,204,255,0.1); color: var(--blue);
+      border: 1px solid var(--blue); border-radius: 20px; padding: 10px 24px;
+      font-size: 0.85rem; font-family: 'Orbitron', sans-serif; font-weight: 700;
+      letter-spacing: 0.1em; cursor: pointer; text-decoration: none;
+      display: inline-block; text-transform: uppercase;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: var(--blue); color: #000; }
+    /* FOOTER */
+    footer { text-align: center; padding: 20px 0; color: var(--teal); font-size: 10px; letter-spacing: 3px; border-top: 1px solid var(--border); }
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      .frame { grid-template-columns: 1fr; }
+      .sidebar { flex-direction: row; height: 50px; }
+      .elbow { border-radius: 20px 0 0 20px; width: 100px; height: 50px; font-size: 9px; }
+      .bar { height: 50px; flex: 1; }
+      .spacer { border-left: none; border-bottom: 6px solid var(--orange); min-height: 0; }
+      .endcap { border-radius: 0 20px 20px 0; height: 50px; }
+      .panel { padding: 20px; }
+      .title { font-size: 20px; }
+      .lcars-btn { padding: 12px 32px; font-size: 1.1rem; }
+    }
+  </style>
 </head>
-
 <body>
-  <!-- Overlay for Audio Context Gesture -->
-  <div id="start-overlay" class="overlay">
-    <div class="overlay-content">
-      <h1>MAX HEADROOM 3D</h1>
-      <p>A reactive 3D wireframe lip-sync experiment.</p>
-      <button id="start-btn" class="daw-btn daw-btn--green wide">Enable Audio &amp; Start</button>
-      <p class="controls-hint">Press ? for keyboard controls or click the help icon.</p>
-    </div>
-  </div>
-
-  <!-- Keyboard Reference Modal -->
-  <div id="keyboard-modal" class="modal overlay">
-    <div class="modal-content">
-      <button id="modal-close" class="modal-close" aria-label="Close keyboard reference">&times;</button>
-      <h2>Controls Reference</h2>
-      <div class="controls-grid">
-        <div class="control-section">
-          <h3>Character Control</h3>
-          <table>
-            <tr>
-              <td><kbd>↑↓←→</kbd></td>
-              <td>Rotate Head</td>
-            </tr>
-            <tr>
-              <td><kbd>I/K/J/L</kbd></td>
-              <td>Move Eyes</td>
-            </tr>
-            <tr>
-              <td><kbd>G</kbd></td>
-              <td>Toggle Sunglasses</td>
-            </tr>
-            <tr>
-              <td><kbd>SPACE</kbd></td>
-              <td>Force Jaw Open</td>
-            </tr>
-          </table>
+  <div class="frame">
+    <aside class="sidebar">
+      <div class="elbow">LCARS</div>
+      <div class="bar amber">SYS-01</div>
+      <div class="bar blue">NET-02</div>
+      <div class="bar red">AUX-03</div>
+      <div class="bar lavender">LOG-04</div>
+      <div class="spacer"></div>
+      <div class="endcap">BIG0TIME</div>
+    </aside>
+    <main class="main">
+      <div class="top-bar">
+        <div>
+          <div class="sys-label">BIG0TIME // PROJECT DATABASE</div>
+          <div class="title">⚡ HEADROOM</div>
         </div>
-        <div class="control-section">
-          <h3>Camera Control</h3>
-          <table>
-            <tr>
-              <td><kbd>W/S/A/D</kbd></td>
-              <td>Rotate &amp; Zoom</td>
-            </tr>
-            <tr>
-              <td><kbd>SHIFT+W/S/A/D</kbd></td>
-              <td>Move Camera</td>
-            </tr>
-            <tr>
-              <td>Right-click drag</td>
-              <td>Free Camera</td>
-            </tr>
-          </table>
+        <div class="badge">NODE ONLINE</div>
+      </div>
+      <div class="divider">
+        <div class="div-pill"></div>
+        <div class="div-label">SYSTEM PROFILE</div>
+        <div class="div-bar"></div>
+      </div>
+      <div class="panel">
+        <div>
+          <div class="type-tag">// APPLICATION</div>
+          <p class="description">A reactive 3D wireframe lip-sync experiment featuring Max Headroom. Speak or pipe audio into the browser and watch the stuttering cyberpunk icon respond in real time with skeletal precision.</p>
         </div>
-        <div class="control-section">
-          <h3>Render Modes</h3>
-          <table>
-            <tr>
-              <td><kbd>1</kbd></td>
-              <td>Wireframe</td>
-            </tr>
-            <tr>
-              <td><kbd>2</kbd></td>
-              <td>Flat Shaded</td>
-            </tr>
-            <tr>
-              <td><kbd>3</kbd></td>
-              <td>Cyber (Default)</td>
-            </tr>
-            <tr>
-              <td><kbd>4</kbd></td>
-              <td>Opaque / Textured</td>
-            </tr>
-          </table>
-        </div>
-        <div class="control-section">
-          <h3>PS4 Controller</h3>
-          <table>
-            <tr>
-              <td>Left Stick</td>
-              <td>Head Yaw / Pitch</td>
-            </tr>
-            <tr>
-              <td>Right Stick</td>
-              <td>Camera Orbit</td>
-            </tr>
-            <tr>
-              <td>L2 + Right Stick</td>
-              <td>Eye Look</td>
-            </tr>
-            <tr>
-              <td>R2 (analog)</td>
-              <td>Jaw Open</td>
-            </tr>
-            <tr>
-              <td>✕ Cross</td>
-              <td>Jaw Snap</td>
-            </tr>
-            <tr>
-              <td>□ Square</td>
-              <td>Toggle Shades</td>
-            </tr>
-            <tr>
-              <td>▲ Triangle</td>
-              <td>Cycle Render Mode</td>
-            </tr>
-            <tr>
-              <td>○ Circle</td>
-              <td>Calibrate Head</td>
-            </tr>
-            <tr>
-              <td>Share</td>
-              <td>Help</td>
-            </tr>
-            <tr>
-              <td>Options</td>
-              <td>Settings</td>
-            </tr>
-          </table>
+        <div class="launch-wrap">
+          <a href="app.html" class="lcars-btn">LAUNCH</a>
+          <a href="https://polerix.github.io/big0time/" class="back-btn">← INDEX</a>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Settings Panel -->
-  <div id="settings-panel" class="settings-panel">
-    <div class="settings-header">
-      <h3>Settings</h3>
-      <button id="settings-close" class="close-btn" aria-label="Close settings">&times;</button>
-    </div>
-    <div class="settings-content">
-      <div class="setting-group">
-        <label for="audio-sensitivity">Audio Sensitivity</label>
-        <input type="range" id="audio-sensitivity" min="20" max="100" value="60" aria-label="Audio sensitivity slider">
-        <span class="setting-value" id="audio-sensitivity-value">60</span>
-      </div>
-      <div class="setting-group">
-        <label for="audio-threshold">Audio Threshold</label>
-        <input type="range" id="audio-threshold" min="0" max="30" value="10" aria-label="Audio threshold slider">
-        <span class="setting-value" id="audio-threshold-value">10</span>
-      </div>
-      <div class="setting-group">
-        <label for="camera-speed">Camera Speed</label>
-        <input type="range" id="camera-speed" min="0.02" max="0.2" step="0.02" value="0.05"
-          aria-label="Camera speed slider">
-        <span class="setting-value" id="camera-speed-value">0.05</span>
-      </div>
-      <div class="setting-group">
-        <label for="rotation-speed">Rotation Speed</label>
-        <input type="range" id="rotation-speed" min="0.01" max="0.05" step="0.001" value="0.02"
-          aria-label="Rotation speed slider">
-        <span class="setting-value" id="rotation-speed-value">0.02</span>
-      </div>
-      <div class="setting-group checkbox">
-        <input type="checkbox" id="audio-feedback" checked aria-label="Enable audio visual feedback">
-        <label for="audio-feedback">Audio Visual Feedback</label>
-      </div>
-      <div class="setting-group">
-        <label for="tex-offset-x">Tex Offset X: <span id="tex-offset-x-val" class="setting-value">0</span></label>
-        <input type="range" id="tex-offset-x" min="-2" max="2" step="0.01" value="0">
-      </div>
-      <div class="setting-group">
-        <label for="tex-offset-y">Tex Offset Y: <span id="tex-offset-y-val" class="setting-value">0</span></label>
-        <input type="range" id="tex-offset-y" min="-2" max="2" step="0.01" value="0">
-      </div>
-      <div class="setting-group">
-        <label for="tex-scale-x">Tex Scale X: <span id="tex-scale-x-val" class="setting-value">1</span></label>
-        <input type="range" id="tex-scale-x" min="0.1" max="5" step="0.01" value="1">
-      </div>
-      <div class="setting-group">
-        <label for="tex-scale-y">Tex Scale Y: <span id="tex-scale-y-val" class="setting-value">1</span></label>
-        <input type="range" id="tex-scale-y" min="0.1" max="5" step="0.01" value="1">
-      </div>
-      <div class="setting-group">
-        <label for="theme-select">Color Theme</label>
-        <select id="theme-select" aria-label="Select color theme">
-          <option value="green">Green (Default)</option>
-          <option value="cyan">Cyan</option>
-          <option value="magenta">Magenta</option>
-          <option value="yellow">Yellow</option>
-        </select>
-      </div>
-      <button id="export-state-btn" class="aqua-button">Export State as URL</button>
-      <button id="settings-reset-btn" class="aqua-button reset">Reset to Defaults</button>
-    </div>
-  </div>
-
-  <!-- App Shell -->
-  <div class="main-container">
-
-    <!-- Header status bar -->
-    <header class="app-header">
-      <h2 class="system-status">SYSTEM_ONLINE /// AUDIO_SYNC_ACTIVE</h2>
-      <div class="header-controls">
-        <button id="perf-monitor" class="aqua-button" title="Toggle Performance Monitor"
-          aria-label="Toggle performance monitor">
-          <span class="perf-label">FPS: <span id="fps-display">60</span></span>
-        </button>
-        <button id="low-process-btn" class="aqua-button" title="Toggle Low-Process Mode (caps to ~24fps)"
-          aria-label="Toggle low-process mode">LP</button>
-        <button id="help-btn" class="aqua-button" title="Show Keyboard Controls"
-          aria-label="Show keyboard controls">?</button>
-        <button id="settings-btn" class="aqua-button" title="Settings" aria-label="Open settings">⚙</button>
-        <button id="fullscreen-btn" class="aqua-button" title="Toggle Fullscreen"
-          aria-label="Toggle fullscreen">⛶</button>
-      </div>
-    </header>
-
-    <!-- Canvas area fills available space -->
-    <main class="content-area">
-      <div class="canvas-wrapper">
-        <video id="webcam-video" autoplay playsinline></video>
-        <canvas id="webgl-canvas"></canvas>
-        <div class="scanlines"></div>
-      </div>
+      <footer>LCARS INTERFACE // BIG0TIME PROJECT DATABASE // STARFLEET SUBSPACE NODE</footer>
     </main>
-
-    <!-- ═══════════════════  DAW CONTROL STRIP  ═══════════════════ -->
-    <footer class="daw-strip" id="daw-strip">
-
-      <!-- ── INPUT SOURCE SECTION ── -->
-      <div class="daw-section daw-section--sources">
-        <div class="daw-section-label">INPUT</div>
-        <div class="daw-sources">
-
-          <div class="source-channel" id="src-keyboard">
-            <div class="source-led" data-color="green"></div>
-            <div class="source-fader-track">
-              <div class="source-fader-knob"></div>
-            </div>
-            <div class="source-name">KEY</div>
-          </div>
-
-          <div class="source-channel" id="src-mouse">
-            <div class="source-led" data-color="blue"></div>
-            <div class="source-fader-track">
-              <div class="source-fader-knob"></div>
-            </div>
-            <div class="source-name">MOUSE</div>
-          </div>
-
-          <div class="source-channel" id="src-video">
-            <div class="source-led" data-color="red"></div>
-            <div class="source-fader-track">
-              <div class="source-fader-knob"></div>
-            </div>
-            <div class="source-name">VIDEO</div>
-          </div>
-
-          <div class="source-channel" id="src-controller">
-            <div class="source-led" data-color="amber"></div>
-            <div class="source-fader-track">
-              <div class="source-fader-knob"></div>
-            </div>
-            <div class="source-name">CTRL</div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="daw-divider"></div>
-
-      <!-- ── HEAD SECTION ── -->
-      <div class="daw-section">
-        <div class="daw-section-label">HEAD</div>
-        <div class="daw-btn-grid daw-btn-grid--dpad">
-          <div></div>
-          <button class="daw-btn daw-btn--green" data-key="ArrowUp" title="Tilt Up" aria-label="Tilt Up">↑</button>
-          <div></div>
-          <button class="daw-btn daw-btn--green" data-key="ArrowLeft" title="Turn Left"
-            aria-label="Turn Left">←</button>
-          <button class="daw-btn daw-btn--green sm" id="calibrate-btn" title="Set Zero Position"
-            aria-label="Calibrate">0</button>
-          <button class="daw-btn daw-btn--green" data-key="ArrowRight" title="Turn Right"
-            aria-label="Turn Right">→</button>
-          <div></div>
-          <button class="daw-btn daw-btn--green" data-key="ArrowDown" title="Tilt Down"
-            aria-label="Tilt Down">↓</button>
-          <div></div>
-        </div>
-      </div>
-
-      <div class="daw-divider"></div>
-
-      <!-- ── EYES SECTION ── -->
-      <div class="daw-section">
-        <div class="daw-section-label">EYES</div>
-        <div class="daw-btn-grid daw-btn-grid--dpad">
-          <div></div>
-          <button class="daw-btn daw-btn--green" data-key="KeyI" title="Look Up" aria-label="Look Up">I</button>
-          <div></div>
-          <button class="daw-btn daw-btn--green" data-key="KeyJ" title="Look Left" aria-label="Look Left">J</button>
-          <button class="daw-btn daw-btn--green sm" title="Center Eyes" aria-label="Center Eyes"
-            id="eye-center-btn">·</button>
-          <button class="daw-btn daw-btn--green" data-key="KeyL" title="Look Right" aria-label="Look Right">L</button>
-          <div></div>
-          <button class="daw-btn daw-btn--green" data-key="KeyK" title="Look Down" aria-label="Look Down">K</button>
-          <div></div>
-        </div>
-      </div>
-
-      <div class="daw-divider"></div>
-
-      <!-- ── MOUTH SECTION ── -->
-      <div class="daw-section">
-        <div class="daw-section-label">MOUTH</div>
-        <div class="daw-btn-stack">
-          <button class="daw-btn daw-btn--red wide" data-key="Space" title="Force Jaw Open"
-            aria-label="Force Jaw Open">JAW</button>
-          <button class="daw-btn daw-btn--red wide" data-key="KeyG" title="Toggle Sunglasses"
-            aria-label="Toggle Sunglasses">SHADES</button>
-        </div>
-      </div>
-
-      <div class="daw-divider"></div>
-
-      <!-- ── CAMERA SECTION ── -->
-      <div class="daw-section">
-        <div class="daw-section-label">CAMERA</div>
-        <div class="daw-camera-layout">
-          <div class="daw-btn-grid daw-btn-grid--dpad">
-            <div></div>
-            <button class="daw-btn daw-btn--blue" data-key="KeyW" title="Zoom In" aria-label="Zoom In">W</button>
-            <div></div>
-            <button class="daw-btn daw-btn--blue" data-key="KeyA" title="Rotate Left"
-              aria-label="Rotate Left">A</button>
-            <button class="daw-btn daw-btn--blue sm" data-key="KeyW" data-shift="true" title="Move Up"
-              aria-label="Move Up">▲</button>
-            <button class="daw-btn daw-btn--blue" data-key="KeyD" title="Rotate Right"
-              aria-label="Rotate Right">D</button>
-            <div></div>
-            <button class="daw-btn daw-btn--blue" data-key="KeyS" title="Zoom Out" aria-label="Zoom Out">S</button>
-            <div></div>
-          </div>
-          <button class="daw-btn daw-btn--blue wide shift-toggle" id="shift-toggle" title="Toggle SHIFT Mode"
-            aria-label="Toggle SHIFT Mode">SHIFT</button>
-        </div>
-      </div>
-
-      <div class="daw-divider"></div>
-
-      <!-- ── RENDER SECTION ── -->
-      <div class="daw-section">
-        <div class="daw-section-label">RENDER</div>
-        <div class="daw-btn-grid daw-btn-grid--2x2">
-          <button class="daw-btn daw-btn--green sm" data-key="Digit1" title="Wireframe"
-            aria-label="Wireframe Mode">WF</button>
-          <button class="daw-btn daw-btn--blue sm" data-key="Digit2" title="Flat Shaded"
-            aria-label="Flat Shaded Mode">FS</button>
-          <button class="daw-btn daw-btn--red sm" data-key="Digit3" title="Cyber Mode"
-            aria-label="Cyber Mode">CB</button>
-          <button class="daw-btn daw-btn--amber sm" data-key="Digit4" title="Opaque Mode"
-            aria-label="Opaque Mode">OP</button>
-        </div>
-      </div>
-
-      <div class="daw-divider"></div>
-
-      <!-- ── STATUS / CONTROLLER ── -->
-      <div class="daw-section daw-section--status">
-        <div class="daw-section-label">STATUS</div>
-        <div class="daw-status-block">
-          <div class="ctrl-status" id="ctrl-status">
-            <div class="ctrl-led" id="ctrl-led"></div>
-            <div class="ctrl-name" id="ctrl-name">NO CTRL</div>
-          </div>
-          <div class="daw-visualizer">
-            <div class="daw-bar"></div>
-            <div class="daw-bar"></div>
-            <div class="daw-bar"></div>
-            <div class="daw-bar"></div>
-            <div class="daw-bar"></div>
-          </div>
-        </div>
-      </div>
-
-    </footer>
-    <!-- ═══════════════════════════════════════════════════════════ -->
-
   </div>
-
-  <script type="module" src="/src/main_obj_legacy.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/thatdhruv/aqua2@main/aqua2.js"></script>
 </body>
-
 </html>
